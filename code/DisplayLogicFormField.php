@@ -8,16 +8,23 @@
  */
 class DisplayLogicFormField extends DataExtension {
 
-	
+
 
 	/**
 	 * The {@link DisplayLogicCriteria} that is evaluated to determine whether this field should display
 	 * @var DisplayLogicCriteria
 	 */
-	protected $displayLogicCriteria = null;
+    protected $displayLogicCriteria = null;
+
+    protected $defaultVisible = true;
 
 
-
+    public function isVisible() {
+        if ($this->displayLogicCriteria != null) {
+            return $this->displayLogicCriteria->evaluate($this->owner) ^ $this->defaultVisible;
+        }
+        return true;
+    }
 
 	/**
 	 * If the criteria evaluate true, the field should display
@@ -101,7 +108,7 @@ class DisplayLogicFormField extends DataExtension {
 	 */
 	public function DisplayLogicMasters() {
 		if($this->displayLogicCriteria) {
-			return implode(",",array_unique($this->displayLogicCriteria->getMasterList()));			
+			return implode(",",array_unique($this->displayLogicCriteria->getMasterList()));
 		}
 	}
 
@@ -133,11 +140,11 @@ class DisplayLogicFormField extends DataExtension {
 			Requirements::css(DISPLAY_LOGIC_DIR.'/css/display_logic.css');
 			return $this->displayLogicCriteria->toScript();
 		}
-		
+
 		return false;
 	}
 	public function onBeforeRender($field) {
-		if($logic = $field->DisplayLogic()) {			
+		if($logic = $field->DisplayLogic()) {
 			$field->setAttribute('data-display-logic-masters', $field->DisplayLogicMasters());
 			$field->setAttribute('data-display-logic-eval', $logic);
 			$field->setAttribute('data-display-logic-animation', $field->DisplayLogicAnimation());
